@@ -30,6 +30,7 @@ namespace DesignPattern
             else
             {
                 _instance = this as T; // GetComponent<T>(); GetComponent -무거움
+                //this as T의 이유 : this만 사용할경우 싱글턴 class만 상속받고, T를 사용하면 싱글턴 ~~를 상속
                 DontDestroyOnLoad(_instance);
             }
         }
