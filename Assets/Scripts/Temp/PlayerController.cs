@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PlayerMovement = Player.PlayerMovement;
 
-namespace JHT_test //playercontroller 클래스 중복 될 수 있으니 namespace사용
-{
+//안씀
     /// <summary>
     /// Movement 테스트용으로 구현한 클래스입니다
     /// Controller 구현하시는 분께서 Movement 호출관련 메서드 정리 끝나시면
@@ -47,5 +47,5 @@ namespace JHT_test //playercontroller 클래스 중복 될 수 있으니 namespace사용
             _movement.SetAvatarRotation(avatarDir);
         }
     }
-}
+
 
