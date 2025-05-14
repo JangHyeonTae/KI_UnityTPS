@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,8 +16,11 @@ namespace Player
         private PlayerStatus _status;
         private PlayerMovement _movement;
 
-        [SerializeField] private GameObject _aimCamera;
-        private GameObject _mainCamera;
+        [SerializeField] private CinemachineVirtualCamera _aimCamera;
+
+        //일반카메라
+        //[SerializeField] private GameObject _aimCamera;
+        //private GameObject _mainCamera;
 
         [SerializeField] private KeyCode _aimKey = KeyCode.Mouse1;
 
@@ -29,7 +33,7 @@ namespace Player
         {
             _status = GetComponent<PlayerStatus>();
             _movement = GetComponent<PlayerMovement>();
-            _mainCamera = Camera.main.gameObject;
+            //_mainCamera = Camera.main.gameObject;
         }
 
         private void HandlePlayerControl()
@@ -67,21 +71,22 @@ namespace Player
 
         public void SubscribeEvents()
         {
-            _status.IsAiming.Subscribe(value => SetActivateAimCamera(value));
-        
+            //_status.IsAiming.Subscribe(value => SetActivateAimCamera(value));
+            _status.IsAiming.Subscribe(_aimCamera.gameObject.SetActive);
             //람다식 아닌버전
 
         }
 
         public void UnSubscribeEvents()
         {
-            _status.IsAiming.UnSubscribe(value => SetActivateAimCamera(value));
+            //_status.IsAiming.UnSubscribe(value => SetActivateAimCamera(value));
+            _status.IsAiming.UnSubscribe(_aimCamera.gameObject.SetActive);
         }
 
         private void SetActivateAimCamera(bool value)
         {
-            _aimCamera.SetActive(value);
-            _mainCamera.SetActive(!value);
+            //_aimCamera.SetActive(value);
+            //_mainCamera.SetActive(!value);
         }
     }
 }
