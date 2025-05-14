@@ -47,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 SetAimRotation()
     {
         //에임의 회전
+        //x는 가로의 움직임, y는 세로의 움직임
         Vector2 mouseDir = GetMouseDirection();
 
         //가로방향은 다 돌아도 돼서 상관없지만, 세로축은 고정돼야해서 선언
@@ -69,6 +70,7 @@ public class PlayerMovement : MonoBehaviour
 
         //에임의 경우 상하 회전 반영
         Vector3 currentEuler = _aim.localEulerAngles; //현재 에임의 각도를 받아옴
+       //aim은 상하 회전을 해야하는데 x축을 변경해야 세로가 회전이 됨 그러므로 currentRotation.y를 사용 -> 다시
         _aim.localEulerAngles = new Vector3(_currentRotation.y, currentEuler.y, currentEuler.z);
 
         //회전 방향 벡터 반환
@@ -78,8 +80,14 @@ public class PlayerMovement : MonoBehaviour
         return rotateDirVector.normalized;
     }
 
-    public void SetBodyRotation()
+    public void SetAvatarRotation(Vector3 direction)
     {
+        //아바타만 회전하도록
+        if (direction == Vector3.zero) return;
+        //어느 방향으로 회전해야할지 설정
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        //조금 더 부드럽게 Lerp
+        _avatar.rotation = Quaternion.Lerp(_avatar.rotation, targetRotation, _playerStatus.RotateSpeed * Time.deltaTime);
 
     }
 
