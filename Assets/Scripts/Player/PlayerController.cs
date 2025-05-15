@@ -64,6 +64,14 @@ namespace Player
             else avatarDir = moveDir;
 
             _movement.SetAvatarRotation(avatarDir);
+
+            // SetAnimationParameter
+            if (_status.IsAiming.Value)
+            {
+                Vector3 input = _movement.GetInputDirection();
+                _animator.SetFloat("X", input.x);
+                _animator.SetFloat("Z", input.z);
+            }
         }
 
         private void HandleAiming()
@@ -75,7 +83,9 @@ namespace Player
         {
             //_status.IsAiming.Subscribe(value => SetActivateAimCamera(value));
             _status.IsAiming.Subscribe(_aimCamera.gameObject.SetActive);
-            _status.IsAiming.Subscribe(SetAimAnimation);
+            _status.IsAiming.Subscribe(SetAimAnimation); //SetAimAnimation의 value는 어떻게 바뀐걸 알까?
+
+            _status.IsMoving.Subscribe(SetMoveAnimation);
             //_status.OnAiming += _aimCamera.gameObject.SetActive; //- CinemachineVirtualCamera.gameObject.SetActive가 왜 될까?
 
         }
@@ -85,6 +95,8 @@ namespace Player
             //_status.IsAiming.UnSubscribe(value => SetActivateAimCamera(value));
             _status.IsAiming.UnSubscribe(_aimCamera.gameObject.SetActive);
             _status.IsAiming.UnSubscribe(SetAimAnimation);
+
+            _status.IsMoving.UnSubscribe(SetMoveAnimation);
         }
 
         private void SetActivateAimCamera(bool value)
@@ -94,6 +106,7 @@ namespace Player
         }
 
         private void SetAimAnimation(bool value) => _animator.SetBool("IsAim", value);
+        private void SetMoveAnimation(bool value) => _animator.SetBool("IsMove", value);
     }
 }
 
