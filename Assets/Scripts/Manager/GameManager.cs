@@ -11,6 +11,6 @@ public class GameManager : Singleton<GameManager>
     private void Init()
     {
         base.SingletonInit();
-        Audio = GetComponent<AudioManager>();
+        Audio = GetComponentInChildren<AudioManager>();
     }
 }

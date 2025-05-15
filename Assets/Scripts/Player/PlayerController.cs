@@ -5,7 +5,6 @@ using UnityEngine;
 
 //참조 생성용 임시 네임스페이스 참조
 //작업물 병합 시 삭제 예정
-using PlayerMovement = Temp.PlayerMovement;
 
 namespace Player
 {
@@ -18,13 +17,14 @@ namespace Player
         private Animator _animator;
 
         [SerializeField] private CinemachineVirtualCamera _aimCamera;
+        [SerializeField] private Gun _gun;
 
         //일반카메라
         //[SerializeField] private GameObject _aimCamera;
         //private GameObject _mainCamera;
 
         [SerializeField] private KeyCode _aimKey = KeyCode.Mouse1;
-
+        [SerializeField] private KeyCode _shootKey = KeyCode.Mouse0;
         private void Awake() => Init();
         private void OnEnable() => SubscribeEvents();
         private void Update() => HandlePlayerControl();
@@ -44,6 +44,19 @@ namespace Player
 
             HandleMovement();
             HandleAiming();
+            HandleShooting();
+        }
+
+        private void HandleShooting()
+        {
+            if (_status.IsAiming.Value && Input.GetKey(_shootKey))
+            {
+                _status.IsAttacking.Value = _gun.Shoot();
+            }
+            else
+            {
+                _status.IsAttacking.Value = false;
+            }
         }
 
         private void HandleMovement()
@@ -84,7 +97,9 @@ namespace Player
             //_status.IsAiming.Subscribe(value => SetActivateAimCamera(value));
             _status.IsAiming.Subscribe(_aimCamera.gameObject.SetActive);
             _status.IsAiming.Subscribe(SetAimAnimation); //SetAimAnimation의 value는 어떻게 바뀐걸 알까?
-
+            
+            _status.IsAttacking.Subscribe(SetAttackAnimation);
+            
             _status.IsMoving.Subscribe(SetMoveAnimation);
             //_status.OnAiming += _aimCamera.gameObject.SetActive; //- CinemachineVirtualCamera.gameObject.SetActive가 왜 될까?
 
@@ -95,6 +110,8 @@ namespace Player
             //_status.IsAiming.UnSubscribe(value => SetActivateAimCamera(value));
             _status.IsAiming.UnSubscribe(_aimCamera.gameObject.SetActive);
             _status.IsAiming.UnSubscribe(SetAimAnimation);
+           
+            _status.IsAttacking.UnSubscribe(SetAttackAnimation);
 
             _status.IsMoving.UnSubscribe(SetMoveAnimation);
         }
@@ -107,6 +124,7 @@ namespace Player
 
         private void SetAimAnimation(bool value) => _animator.SetBool("IsAim", value);
         private void SetMoveAnimation(bool value) => _animator.SetBool("IsMove", value);
+        private void SetAttackAnimation(bool value) => _animator.SetBool("IsAttack", value);
     }
 }
 
