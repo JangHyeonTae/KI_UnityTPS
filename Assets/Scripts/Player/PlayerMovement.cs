@@ -22,7 +22,7 @@ namespace Player
         [SerializeField][Range(0, 90)] private float _maxPitch; //최대각도
         [SerializeField][Range(0, 5)] private float _mouseSensitivity = 1;
 
-        Vector3 _currentRotation;
+        Vector2 _currentRotation;
         private void Awake() => Init();
 
         private void Init()
@@ -45,21 +45,14 @@ namespace Player
 
             return moveDirection;
         }
-
+         
         //어떤 방향으로 회전하고있는지 -Vector3
         public Vector3 SetAimRotation()
         {
             //에임의 회전
             //x는 가로의 움직임, y는 세로의 움직임
             Vector2 mouseDir = GetMouseDirection();
-
-            //가로방향은 다 돌아도 돼서 상관없지만, 세로축은 고정돼야해서 선언
-            //Vector2 currentRotation = new()
-            //{
-            //    x = transform.rotation.eulerAngles.x,
-            //    y = transform.rotation.eulerAngles.y
-            //};
-
+            
             //y축 회전 설명 다시
             //x축의 경우라면 제한을 걸 필요 없음
             _currentRotation.x += mouseDir.x;
@@ -76,9 +69,10 @@ namespace Player
                                                           //aim은 상하 회전을 해야하는데 x축을 변경해야 세로가 회전이 됨 그러므로 currentRotation.y를 사용 -> 다시
             _aim.localEulerAngles = new Vector3(_currentRotation.y, currentEuler.y, currentEuler.z);
 
-            //회전 방향 벡터 반환
+            //회전 방향 벡터 반환 -> 물어보기
+            //어느 방향으로 회전을 했는지 반환?
             Vector3 rotateDirVector = transform.forward;
-            rotateDirVector.y = 0;
+            rotateDirVector.y = 0; //y축의 회전은 적용되지 않게
 
             return rotateDirVector.normalized;
         }

@@ -15,6 +15,7 @@ namespace Player
 
         private PlayerStatus _status;
         private PlayerMovement _movement;
+        private Animator _animator;
 
         [SerializeField] private CinemachineVirtualCamera _aimCamera;
 
@@ -33,6 +34,7 @@ namespace Player
         {
             _status = GetComponent<PlayerStatus>();
             _movement = GetComponent<PlayerMovement>();
+            _animator = GetComponent<Animator>();
             //_mainCamera = Camera.main.gameObject;
         }
 
@@ -56,7 +58,7 @@ namespace Player
             Vector3 moveDir = _movement.SetMove(moveSpeed);
             _status.IsMoving.Value = (moveDir != Vector3.zero);
 
-            // 몸체의 회전기능 SetbodyRotation
+            // 몸체의 회전기능 SetAvatarRotation
             Vector3 avatarDir;
             if (_status.IsAiming.Value) avatarDir = camRotateDir;
             else avatarDir = moveDir;
@@ -73,7 +75,8 @@ namespace Player
         {
             //_status.IsAiming.Subscribe(value => SetActivateAimCamera(value));
             _status.IsAiming.Subscribe(_aimCamera.gameObject.SetActive);
-            //람다식 아닌버전
+            _status.IsAiming.Subscribe(SetAimAnimation);
+            //_status.OnAiming += _aimCamera.gameObject.SetActive; //- CinemachineVirtualCamera.gameObject.SetActive가 왜 될까?
 
         }
 
@@ -81,6 +84,7 @@ namespace Player
         {
             //_status.IsAiming.UnSubscribe(value => SetActivateAimCamera(value));
             _status.IsAiming.UnSubscribe(_aimCamera.gameObject.SetActive);
+            _status.IsAiming.UnSubscribe(SetAimAnimation);
         }
 
         private void SetActivateAimCamera(bool value)
@@ -88,6 +92,8 @@ namespace Player
             //_aimCamera.SetActive(value);
             //_mainCamera.SetActive(!value);
         }
+
+        private void SetAimAnimation(bool value) => _animator.SetBool("IsAim", value);
     }
 }
 
