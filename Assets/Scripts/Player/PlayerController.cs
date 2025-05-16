@@ -2,6 +2,7 @@ using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 //참조 생성용 임시 네임스페이스 참조
 //작업물 병합 시 삭제 예정
@@ -15,9 +16,12 @@ namespace Player
         private PlayerStatus _status;
         private PlayerMovement _movement;
         private Animator _animator;
+        private Image _aimImage;
 
         [SerializeField] private CinemachineVirtualCamera _aimCamera;
         [SerializeField] private Gun _gun;
+        [SerializeField] private Animator _aimAnimator;
+
 
         //일반카메라
         //[SerializeField] private GameObject _aimCamera;
@@ -35,6 +39,7 @@ namespace Player
             _status = GetComponent<PlayerStatus>();
             _movement = GetComponent<PlayerMovement>();
             _animator = GetComponent<Animator>();
+            _aimImage = _aimAnimator.GetComponent<Image>();
             //_mainCamera = Camera.main.gameObject;
         }
 
@@ -122,7 +127,15 @@ namespace Player
             //_mainCamera.SetActive(!value);
         }
 
-        private void SetAimAnimation(bool value) => _animator.SetBool("IsAim", value);
+        private void SetAimAnimation(bool value)
+        {
+            if (!_aimImage.enabled)
+            {
+                _aimImage.enabled=true;
+            }
+            _animator.SetBool("IsAim", value);
+            _aimAnimator.SetBool("IsAim", value);
+        }
         private void SetMoveAnimation(bool value) => _animator.SetBool("IsMove", value);
         private void SetAttackAnimation(bool value) => _animator.SetBool("IsAttack", value);
     }
