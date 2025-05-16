@@ -21,7 +21,7 @@ namespace Player
         [SerializeField] private CinemachineVirtualCamera _aimCamera;
         [SerializeField] private Gun _gun;
         [SerializeField] private Animator _aimAnimator;
-
+        [SerializeField] private HpGuageUI _hpUI;
 
         //일반카메라
         //[SerializeField] private GameObject _aimCamera;
@@ -41,6 +41,10 @@ namespace Player
             _animator = GetComponent<Animator>();
             _aimImage = _aimAnimator.GetComponent<Image>();
             //_mainCamera = Camera.main.gameObject;
+
+            _hpUI.SetImageFillAmount(1);
+            _status.CurrentHp.Value = _status.MaxHp;
+
         }
 
         private void HandlePlayerControl()
@@ -50,6 +54,15 @@ namespace Player
             HandleMovement();
             HandleAiming();
             HandleShooting();
+
+            if (Input.GetKey(KeyCode.Alpha1))
+            {
+                TakeDamage(1);
+            }
+            if (Input.GetKey(KeyCode.Alpha2))
+            {
+                RecoveryHP(1);
+            }
         }
 
         private void HandleShooting()
@@ -97,8 +110,33 @@ namespace Player
             _status.IsAiming.Value = Input.GetKey(_aimKey);
         }
 
+        public void TakeDamage(int value)
+        {
+            // 체력을 떨어뜨리되, 체력이 0이 되면 플레이어가 죽도록 처리함
+            _status.CurrentHp.Value = Mathf.Max(0, _status.CurrentHp.Value - value);
+            if (_status.CurrentHp.Value == 0)
+            {
+                Dead();
+            }
+        }
+
+        public void RecoveryHP(int value)
+        {
+            // 체력을 높이되, MaxHp 초과를 막아야함
+            //_status.CurrentHp.Value = Mathf.Min(_status.MaxHp, _status.CurrentHp.Value + value);
+            int hp = _status.CurrentHp.Value + value;
+
+            _status.CurrentHp.Value = Mathf.Clamp(hp, 0, _status.MaxHp);
+        }
+
+        public void Dead()
+        {
+            Debug.Log("플레이어 사망 처리");
+        }
+
         public void SubscribeEvents()
         {
+            _status.CurrentHp.Subscribe(SetHpUIGuage);
             //_status.IsAiming.Subscribe(value => SetActivateAimCamera(value));
             _status.IsAiming.Subscribe(_aimCamera.gameObject.SetActive);
             _status.IsAiming.Subscribe(SetAimAnimation); //SetAimAnimation의 value는 어떻게 바뀐걸 알까?
@@ -112,6 +150,7 @@ namespace Player
 
         public void UnSubscribeEvents()
         {
+            _status.CurrentHp.UnSubscribe(SetHpUIGuage);
             //_status.IsAiming.UnSubscribe(value => SetActivateAimCamera(value));
             _status.IsAiming.UnSubscribe(_aimCamera.gameObject.SetActive);
             _status.IsAiming.UnSubscribe(SetAimAnimation);
@@ -138,6 +177,12 @@ namespace Player
         }
         private void SetMoveAnimation(bool value) => _animator.SetBool("IsMove", value);
         private void SetAttackAnimation(bool value) => _animator.SetBool("IsAttack", value);
+        private void SetHpUIGuage(int currentHp)
+        {
+            //현재수치 / 최대수치
+            float hp = currentHp / (float)_status.MaxHp;
+            _hpUI.SetImageFillAmount(hp);
+        }
     }
 }
 
