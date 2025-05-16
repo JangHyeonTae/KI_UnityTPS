@@ -38,10 +38,10 @@ public class Gun : MonoBehaviour
 
         // TODO : Ray 발사 -> 반환받은 대상에게 데미지 부여
         //몬스터 구현시 같이 구현
-        GameObject target = RayShoot();
+        IDamagable target = RayShoot();
         if (target == null) return true;
 
-        Debug.Log($"총에 맞음 : {target.name}");
+        target.TakeDamage(_shootDamage);
 
         return true;
     }
@@ -53,7 +53,7 @@ public class Gun : MonoBehaviour
         _currentCount -= Time.deltaTime;
     }
 
-    private GameObject RayShoot()
+    private IDamagable RayShoot()
     {
         //+ScreenToPointToRay - 마우스 없애는기능에 더하면 좋음
         Ray ray = new Ray(_camera.transform.position, _camera.transform.forward);
@@ -62,7 +62,9 @@ public class Gun : MonoBehaviour
         if (Physics.Raycast(ray, out hit, _attackRange, _targetLayer))
         {
             //TODO : 몬스터를 어덯게 구현하는가에 따라 다름
-            return hit.transform.gameObject;
+            //성능상 getcomponent는 안 좋을수도있음
+            //어떻게 해결할지 월요일에 다룸 - 고민해보기
+            return hit.transform.GetComponent<IDamagable>();
         }
 
         return null;

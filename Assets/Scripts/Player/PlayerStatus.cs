@@ -34,3 +34,7 @@ public class PlayerStatus : MonoBehaviour
     
 
 }
+
+//판정 후 실제 적용돼야하는 FillAmount - A 데이터로 가지고있고
+//현재 적용중인 FillAmount를 따로두고 - B
+//A와 B가 다르다면 deltaTime만큼 적용
