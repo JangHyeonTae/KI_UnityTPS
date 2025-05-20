@@ -29,8 +29,7 @@ public class HpGuageUI : MonoBehaviour
         _image.fillAmount = value;
     }
 
-
-    // Test2 -> 얘가 젤 ㄱㅊ
+    //카메라에 따른 ui회전
     public void SetUIForwardVector(Vector3 target)
     {
         transform.forward = target;

@@ -22,7 +22,7 @@ public class PlayerStatus : MonoBehaviour
 
 
     //Player Stat Event
-    public ObservableProperty<int> CurrentHp { get; private set; } = new();
+    [field : SerializeField] public ObservableProperty<int> CurrentHp { get; private set; } = new();
 
 
     //Player State Event

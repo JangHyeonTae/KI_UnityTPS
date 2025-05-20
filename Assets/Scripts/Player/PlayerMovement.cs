@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 namespace Player
@@ -22,7 +23,10 @@ namespace Player
         [SerializeField][Range(0, 90)] private float _maxPitch; //최대각도
         [SerializeField][Range(0, 5)] private float _mouseSensitivity = 1;
 
-        Vector2 _currentRotation;
+        Vector2 _currentRotation; 
+        public Vector2 InputDirection { get; private set; }
+        public Vector2 MouseDirection { get; private set; }
+
         private void Awake() => Init();
 
         private void Init()
@@ -51,15 +55,15 @@ namespace Player
         {
             //에임의 회전
             //x는 가로의 움직임, y는 세로의 움직임
-            Vector2 mouseDir = GetMouseDirection();
+            //Vector2 mouseDir = GetMouseDirection();
             
             //y축 회전 설명 다시
             //x축의 경우라면 제한을 걸 필요 없음
-            _currentRotation.x += mouseDir.x;
+            _currentRotation.x += MouseDirection.x;
 
             //y축의 경우엔 각도 제한을 걸어야함
             _currentRotation.y =
-                Mathf.Clamp(_currentRotation.y + mouseDir.y, _minPitch, _maxPitch);
+                Mathf.Clamp(_currentRotation.y + MouseDirection.y, _minPitch, _maxPitch);
 
             //하나 더 생각해야할 경우 : 캐릭터 오브젝트의 경우에는 y축 회전만반영
             transform.rotation = Quaternion.Euler(0, _currentRotation.x, 0);
@@ -88,36 +92,56 @@ namespace Player
 
         }
 
-        //마우스 
-        private Vector2 GetMouseDirection()
-        {
-            float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity;//가로축 마우스 - Horizontal
-            float mouseY = -Input.GetAxis("Mouse Y") * _mouseSensitivity;//세로축 마우스 - Vertical, 반대로 적용해줘야함
-
-            return new Vector2(mouseX, mouseY);
-        }
-
         //움직임 
         public Vector3 GetMoveDirection()
         {
-            Vector3 input = GetInputDirection();
+            Vector3 input = InputDirection;
 
             //실제 움직여야하는 방향 - 플레이어 위치기반 움직여아하는 방향
             Vector3 direction =
                 (transform.right * input.x) +
-                (transform.forward * input.z);
+                (transform.forward * input.y);
 
             //vector3의 방향 가져오기
             return direction.normalized;
         }
-
-        public Vector3 GetInputDirection()
+        //InputSystem - callback
+        
+        public void OnMove(InputValue value)
         {
-            float x = Input.GetAxisRaw("Horizontal");
-            float z = Input.GetAxisRaw("Vertical");
-
-            return new Vector3(x, 0, z);
+            InputDirection = value.Get<Vector2>();
         }
+
+        public void OnRotate(InputValue value)
+        {
+            Vector2 mouseDir = value.Get<Vector2>();
+            mouseDir.y *= -1;
+            MouseDirection = mouseDir * _mouseSensitivity;
+        }
+
+        public Vector3 GlobalPos()
+        {
+            Vector3 globalPos = gameObject.transform.position;
+            return globalPos;
+        }
+
+        //InputManager
+        //public Vector3 GetInputDirection()
+        //{
+        //    float x = Input.GetAxisRaw("Horizontal");
+        //    float z = Input.GetAxisRaw("Vertical");
+        //
+        //    return new Vector3(x, 0, z);
+        //}
+
+        //마우스 - InputManager
+        //private Vector2 GetMouseDirection()
+        //{
+        //    float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity;//가로축 마우스 - Horizontal
+        //    float mouseY = -Input.GetAxis("Mouse Y") * _mouseSensitivity;//세로축 마우스 - Vertical, 반대로 적용해줘야함
+        //
+        //    return new Vector2(mouseX, mouseY);
+        //}
     }
 
 
